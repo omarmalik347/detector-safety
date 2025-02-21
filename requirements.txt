@@ -1,0 +1,5 @@
+yolov5
+opencv-python-headless
+numpy
+streamlit
+Pillow
