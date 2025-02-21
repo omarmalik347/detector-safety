@@ -1,6 +1,7 @@
 yolov5
 opencv-python
 numpy
-tk
+streamlit
+pillow
 torch
 torchvision
