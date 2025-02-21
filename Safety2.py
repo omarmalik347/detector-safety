@@ -1,8 +1,11 @@
 import yolov5
-import cv2
 import numpy as np
 import streamlit as st
 from PIL import Image, ImageDraw, ImageFont
+
+@st.cache_resource
+def load_model():
+    return yolov5.load('keremberke/yolov5m-construction-safety')
 
 def upload_image():
     uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
@@ -12,25 +15,23 @@ def upload_image():
     return None
 
 def draw_boxes_on_image(image, results, class_names):
-    image = np.array(image)
-    image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+    image = image.convert("RGB")
+    draw = ImageDraw.Draw(image)
 
     for *box, conf, cls in results.pred[0]:
         x1, y1, x2, y2 = map(int, box)
         label = f"{class_names[int(cls)]}: {conf:.2f}"
-        color = (0, 255, 0)
-        cv2.rectangle(image, (x1, y1), (x2, y2), color, 2)
-        cv2.putText(image, label, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
+        draw.rectangle([x1, y1, x2, y2], outline="green", width=3)
+        draw.text((x1, y1 - 10), label, fill="green")
     
-    return Image.fromarray(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
+    return image
 
-model = yolov5.load('keremberke/yolov5m-construction-safety')
+
+model = load_model()
 
 class_names = model.names
-
-
-model.conf = 0.15  
-model.iou = 0.30  
+model.conf = 0.15
+model.iou = 0.30
 model.agnostic = False
 model.multi_label = False
 model.max_det = 1000
